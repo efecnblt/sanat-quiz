@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galeri — Sanat Tarihi Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f3ede2; --paper2:#ebe3d4; --card:#fbf8f2; --ink:#1d1a16; --muted:#6f665a;
+    --line:#d8ccb7; --gold:#a8834a; --gold2:#c9a66b; --wine:#7b2323; --olive:#4f6b3a;
+    --serif:'Cormorant Garamond', Georgia, serif; --sans:'Inter', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  body{min-height:100vh;background:
+    radial-gradient(1200px 600px at 50% -10%, #fffaf0 0%, transparent 60%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.012) 0 2px, transparent 2px 4px), var(--paper)}
+  .wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+  header.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+  .brand{font-family:var(--serif);font-size:22px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+  .brand span{color:var(--gold)}
+  .meta{font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .hidden{display:none !important}
+
+  /* Start */
+  .hero{text-align:center;padding:20px 0 8px}
+  .eyebrow{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);font-weight:600}
+  .hero h1{font-family:var(--serif);font-weight:600;font-size:clamp(42px,8vw,68px);line-height:1.02;margin:14px 0 14px}
+  .hero h1 em{font-style:italic;color:var(--wine)}
+  .hero p{color:var(--muted);max-width:520px;margin:0 auto;line-height:1.6;font-size:15px}
+  .rule{display:flex;align-items:center;gap:14px;justify-content:center;margin:30px 0 22px;color:var(--gold)}
+  .rule::before,.rule::after{content:"";height:1px;width:80px;background:var(--line)}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:22px;box-shadow:0 1px 0 #fff inset,0 18px 40px -28px rgba(60,40,10,.35)}
+  .label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:12px}
+  .lengths{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+  .len{border:1px solid var(--line);background:transparent;border-radius:3px;padding:14px 8px;cursor:pointer;text-align:center;font-family:var(--sans);color:var(--ink);transition:.15s}
+  .len b{display:block;font-family:var(--serif);font-size:30px;font-weight:600;line-height:1}
+  .len small{font-size:12px;color:var(--muted)}
+  .len.on{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+  .len.on small{color:#cfc4b0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid var(--line);background:transparent;border-radius:99px;padding:8px 14px;font-size:13px;cursor:pointer;color:var(--ink);font-family:var(--sans);transition:.15s}
+  .chip.on{background:var(--wine);border-color:var(--wine);color:#fff}
+  .chip .n{opacity:.6;margin-left:4px;font-size:11px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:none;background:var(--ink);color:var(--paper);padding:16px 28px;border-radius:3px;font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:.15s}
+  .btn:hover{background:var(--wine)}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+  .btn.ghost:hover{background:var(--ink);color:var(--paper)}
+  .btn:disabled{opacity:.35;cursor:default;background:var(--ink)}
+  .start-row{display:flex;justify-content:center;margin-top:26px}
+  .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:14px}
+
+  /* Quiz */
+  .progress{height:2px;background:var(--line);margin-bottom:18px;position:relative;overflow:hidden}
+  .progress i{position:absolute;left:0;top:0;bottom:0;background:var(--gold);transition:width .4s ease}
+  .qhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+  .qnum{font-family:var(--serif);font-size:15px;color:var(--muted);letter-spacing:.1em}
+  .qnum b{font-size:28px;color:var(--ink);font-weight:600;margin-right:4px}
+  .score-pill{font-size:12px;color:var(--muted);letter-spacing:.06em}
+  .score-pill b{color:var(--ink)}
+  .frame{position:relative;padding:10px;background:linear-gradient(135deg,#c9a66b,#8a6a35 40%,#d8bb82 60%,#9b7a42);border-radius:2px;box-shadow:0 22px 44px -30px rgba(50,30,0,.6)}
+  .frame-inner{background:var(--card);padding:34px 30px 30px;border:1px solid rgba(0,0,0,.15)}
+  .cat{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:12px}
+  .question{font-family:var(--serif);font-size:clamp(24px,4.6vw,31px);line-height:1.22;font-weight:600}
+  .opts{display:grid;gap:10px;margin-top:22px}
+  .opt{display:flex;align-items:center;gap:14px;text-align:left;width:100%;background:var(--card);border:1px solid var(--line);border-radius:3px;padding:14px 16px;font-family:var(--sans);font-size:15px;color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s,transform .1s}
+  .opt:hover:not(:disabled){border-color:var(--ink);transform:translateX(2px)}
+  .opt .k{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:15px;color:var(--muted)}
+  .opt:disabled{cursor:default}
+  .opt.right{border-color:var(--olive);background:#eef2e6}
+  .opt.right .k{background:var(--olive);border-color:var(--olive);color:#fff}
+  .opt.wrong{border-color:var(--wine);background:#f6e9e6}
+  .opt.wrong .k{background:var(--wine);border-color:var(--wine);color:#fff}
+  .opt.dim{opacity:.5}
+  .caption{margin-top:18px;padding:14px 16px;border-left:3px solid var(--gold);background:var(--paper2);font-size:14px;line-height:1.55;color:#3d362d;animation:fade .3s ease}
+  .caption b{font-family:var(--serif);font-size:17px;display:block;margin-bottom:2px}
+  .caption.ok b{color:var(--olive)} .caption.no b{color:var(--wine)}
+  .next-row{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:12px}
+  .quit{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-family:var(--sans)}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .slide{animation:fade .35s ease}
+
+  /* Result */
+  .result{text-align:center}
+  .big{font-family:var(--serif);font-size:clamp(76px,16vw,120px);font-weight:600;line-height:1;margin:10px 0 0}
+  .big small{font-size:.38em;color:var(--muted)}
+  .title-earned{font-family:var(--serif);font-style:italic;font-size:30px;color:var(--wine);margin-top:8px}
+  .result p.sub{color:var(--muted);margin-top:8px;font-size:15px}
+  .bars{margin-top:26px;text-align:left;display:grid;gap:12px}
+  .bar-row{display:grid;grid-template-columns:150px 1fr 54px;gap:12px;align-items:center;font-size:13px}
+  .bar{height:8px;background:var(--paper2);border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--gold);border-radius:99px}
+  .bar-row span:last-child{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+  .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+  .review{margin-top:34px;text-align:left}
+  .review h3{font-family:var(--serif);font-size:26px;font-weight:600;margin-bottom:12px}
+  .rv{border-top:1px solid var(--line);padding:14px 0;font-size:14px;line-height:1.5}
+  .rv .q{font-family:var(--serif);font-size:19px;font-weight:600;margin-bottom:4px}
+  .rv .y{color:var(--wine)} .rv .c{color:var(--olive)}
+  .rv .e{color:var(--muted);margin-top:4px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:3px;font-size:13px;opacity:0;transition:.25s;pointer-events:none}
+  .toast.show{opacity:1}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px;letter-spacing:.06em}
+  @media (max-width:560px){
+    .frame-inner{padding:24px 18px 20px}
+    .bar-row{grid-template-columns:110px 1fr 46px}
+    .wrap{padding:20px 14px 50px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Gale<span>r</span>i</div>
+    <div class="meta" id="meta">Sanat Tarihi · 100 Soru</div>
+  </header>
+
+  <!-- START -->
+  <section id="start">
+    <div class="hero">
+      <div class="eyebrow">Mağara duvarlarından çağdaş sanata</div>
+      <h1>Gözün ne kadar <em>eğitimli?</em></h1>
+      <p>Tarih öncesinden Rönesans’a, Osmanlı minyatüründen pop art’a 100 soruluk bir müze turu. Her cevabın ardından kısa bir “müze etiketi” seni bekliyor.</p>
+    </div>
+    <div class="rule">✦</div>
+    <div class="panel">
+      <div class="label">Tur uzunluğu</div>
+      <div class="lengths" id="lengths">
+        <button class="len on" data-n="20"><b>20</b><small>Kısa ziyaret</small></button>
+        <button class="len" data-n="50"><b>50</b><small>Uzun tur</small></button>
+        <button class="len" data-n="100"><b>100</b><small>Tüm koleksiyon</small></button>
+      </div>
+      <div class="label">Salonlar</div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="start-row"><button class="btn" id="go">Tura başla →</button></div>
+    <div class="hint">Klavyeden 1–4 ile seçebilir, Enter ile ilerleyebilirsin.</div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="hidden">
+    <div class="progress"><i id="bar"></i></div>
+    <div class="qhead">
+      <div class="qnum"><b id="qi">1</b>/ <span id="qt">20</span></div>
+      <div class="score-pill">Doğru: <b id="sc">0</b></div>
+    </div>
+    <div class="frame"><div class="frame-inner slide" id="card">
+      <div class="cat" id="cat"></div>
+      <div class="question" id="q"></div>
+      <div class="opts" id="opts"></div>
+      <div id="cap"></div>
+    </div></div>
+    <div class="next-row">
+      <button class="quit" id="quit">Turu bitir</button>
+      <button class="btn" id="next" disabled>Sonraki →</button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="hidden">
+    <div class="panel result">
+      <div class="eyebrow">Tur tamamlandı</div>
+      <div class="big" id="pct">0<small>%</small></div>
+      <div class="title-earned" id="rank"></div>
+      <p class="sub" id="sub"></p>
+      <div class="bars" id="bars"></div>
+      <div class="actions">
+        <button class="btn" id="again">Yeni tur</button>
+        <button class="btn ghost" id="share">Skorunu kopyala</button>
+      </div>
+    </div>
+    <div class="review" id="review"></div>
+  </section>
+
+  <footer>Galeri · Sanat tarihi meraklıları için</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// Her soruda a[0] doğru cevaptır; şıklar ekranda karıştırılır.
+const Q = [
+// ── TARİH ÖNCESİ & ANTİK ──
+{c:"Antik",q:"Altamira mağara resimleri hangi ülkededir?",a:["İspanya","Fransa","İtalya","Portekiz"],e:"Kuzey İspanya’daki Altamira’nın bizon resimleri yaklaşık 36.000–15.000 yıl öncesine tarihlenir."},
+{c:"Antik",q:"Paleolitik dönemin ünlü bereket figürü “Willendorf Venüsü” hangi ülkede bulunmuştur?",a:["Avusturya","Almanya","Fransa","Çekya"],e:"1908’de Avusturya’da bulunan figür yaklaşık 25.000 yıllık; bugün Viyana Doğa Tarihi Müzesi’nde."},
+{c:"Antik",q:"Bilinen en eski anıtsal tapınak yapılarından Göbeklitepe hangi ildedir?",a:["Şanlıurfa","Mardin","Adıyaman","Diyarbakır"],e:"Yaklaşık 11.500 yıllık T biçimli dikilitaşları, insanlık tarihinin bilinen en eski anıtsal yapıları arasında."},
+{c:"Antik",q:"Duvar resimleri ve “Ana Tanrıça” figürüyle bilinen Neolitik yerleşim Çatalhöyük hangi ildedir?",a:["Konya","Ankara","Çorum","Burdur"],e:"Konya Ovası’ndaki Çatalhöyük UNESCO Dünya Mirası listesindedir; oturan kadın figürü Anadolu Medeniyetleri Müzesi’nde."},
+{c:"Antik",q:"Ünlü Nefertiti büstü bugün hangi müzede sergilenir?",a:["Neues Museum, Berlin","British Museum, Londra","Louvre, Paris","Mısır Müzesi, Kahire"],e:"1912’de Amarna’da bulunan büst Berlin’dedir; Mısır uzun süredir iadesini talep ediyor."},
+{c:"Antik",q:"Giza’daki Büyük Piramit hangi firavun için yapılmıştır?",a:["Khufu (Keops)","Khafre (Kefren)","Menkaure (Mikerinos)","Djoser"],e:"MÖ 2560 civarına tarihlenen Büyük Piramit, Antik Dünyanın Yedi Harikası’ndan ayakta kalan tek eser."},
+{c:"Antik",q:"Antik Yunan heykelinde ağırlığın tek bacağa verildiği, gövdenin hafif kıvrıldığı duruşa ne denir?",a:["Kontrapposto","Sfumato","Entasis","Arkaik gülümseme"],e:"Kontrapposto, figürlere doğal ve canlı bir duruş kazandırır; Rönesans’ta yeniden keşfedilmiştir."},
+{c:"Antik",q:"Atina Akropolisi’ndeki Parthenon hangi tanrıçaya adanmıştır?",a:["Athena","Hera","Artemis","Afrodit"],e:"MÖ 447–432 arasında Athena Parthenos (bakire Athena) adına inşa edildi."},
+{c:"Antik",q:"Parthenon’un heykel programını yöneten ünlü heykeltıraş kimdir?",a:["Phidias (Fidias)","Praxiteles","Lysippos","Polykleitos"],e:"Phidias, Parthenon’daki dev Athena heykelini ve Olympia’daki Zeus heykelini de yapmıştır."},
+{c:"Antik",q:"“Diskobolos” (Disk Atan) heykelinin özgün bronzunu yapan heykeltıraş kimdir?",a:["Myron","Phidias","Polykleitos","Praxiteles"],e:"Özgün bronz kayıp; bugün Roma dönemi mermer kopyalarından tanıyoruz."},
+{c:"Antik",q:"Yılanlarla boğuşan rahibi ve oğullarını gösteren “Laokoon Grubu” bugün nerededir?",a:["Vatikan Müzeleri","Louvre","Uffizi","British Museum"],e:"1506’da Roma’da bulundu; kazıyı izleyenler arasında Michelangelo da vardı."},
+{c:"Antik",q:"Başlığı akantus yapraklarıyla süslenen Yunan sütun düzeni hangisidir?",a:["Korint","Dor","İon","Toskan"],e:"Dor sade, İon volütlü (sarmal), Korint ise akantus yapraklı başlığıyla tanınır."},
+{c:"Antik",q:"Tepesinde “oculus” denen açıklık bulunan devasa kubbeli Roma tapınağı hangisidir?",a:["Pantheon","Kolezyum","Maison Carrée","Ara Pacis"],e:"Hadrianus döneminde (MS 2. yy) yeniden yapılan Pantheon’un kubbesi hâlâ dünyanın en büyük donatısız beton kubbesi."},
+{c:"Antik",q:"Fayum mumya portrelerinde kullanılan, boyanın sıcak balmumuyla karıştırıldığı teknik hangisidir?",a:["Enkaustik","Fresk","Guaj","Pastel"],e:"Roma dönemi Mısır’ından kalan bu portreler, dikkat çekici gerçekçilikleriyle ünlüdür."},
+
+// ── ORTA ÇAĞ & BİZANS ──
+{c:"Orta Çağ",q:"Ayasofya’nın (537) mimarları kimlerdir?",a:["Trallesli Anthemios ve Miletli İsidoros","Mimar Sinan ve Davut Ağa","Şamlı Apollodoros","Vitruvius ve Agrippa"],e:"İkisi de matematik ve geometri alanında uzman mimar-mühendislerdi; kubbe yaklaşık beş yılda tamamlandı."},
+{c:"Orta Çağ",q:"Bugünkü Ayasofya hangi Bizans imparatoru döneminde yaptırılmıştır?",a:["I. Justinianus","I. Konstantin","II. Theodosius","Herakleios"],e:"Nika İsyanı’nda yanan eski kilisenin yerine Justinianus tarafından yaptırıldı."},
+{c:"Orta Çağ",q:"Justinianus ve Theodora’yı gösteren ünlü mozaikler Ravenna’da hangi kilisededir?",a:["San Vitale","Sant’Apollinare Nuovo","San Marco","Santa Maria Maggiore"],e:"547’de kutsanan San Vitale, Bizans mozaik sanatının en parlak örneklerinden."},
+{c:"Orta Çağ",q:"Yaklaşık 70 metrelik “Bayeux Halısı” hangi olayı anlatır?",a:["1066 Norman fethini","Birinci Haçlı Seferi’ni","Yüz Yıl Savaşları’nı","Magna Carta’nın imzalanmasını"],e:"Aslında bir dokuma değil, keten üzerine yün nakıştır; Hastings Savaşı’na kadar olan olayları anlatır."},
+{c:"Orta Çağ",q:"Gotik mimarinin doğuşu kabul edilen yapı hangisidir?",a:["Saint-Denis Bazilikası","Notre-Dame de Paris","Köln Katedrali","Westminster Abbey"],e:"Başrahip Suger’in 1140’larda yeniden yaptırdığı koro, ışığı içeri alan Gotik anlayışın başlangıcı sayılır."},
+{c:"Orta Çağ",q:"Gotik katedrallerde yüksek duvarları dışarıdan destekleyen kemerli payandalara ne denir?",a:["Uçan payanda","Pandantif","Tromp","Apsis"],e:"Uçan payandalar duvarları inceltip büyük vitray pencereler açmayı mümkün kıldı."},
+
+// ── RÖNESANS ──
+{c:"Rönesans",q:"Padova’daki Scrovegni Şapeli fresklerini kim yapmıştır?",a:["Giotto","Cimabue","Duccio","Masaccio"],e:"1305 civarı tamamlanan freskler, figürlere hacim ve duygu kazandırmasıyla Rönesans’ın habercisi sayılır."},
+{c:"Rönesans",q:"Floransa Katedrali’nin dev kubbesini tasarlayan mimar kimdir?",a:["Filippo Brunelleschi","Leon Battista Alberti","Donato Bramante","Michelangelo"],e:"1436’da tamamlanan kubbe, iskele kurmadan çift kabuk sistemiyle inşa edildi."},
+{c:"Rönesans",q:"Doğrusal perspektifin ilk kusursuz uygulamalarından “Kutsal Üçlü” freski kimindir?",a:["Masaccio","Fra Angelico","Paolo Uccello","Piero della Francesca"],e:"Santa Maria Novella’daki fresk (1427 civarı), duvarda bir şapel açılmış gibi derinlik yanılsaması yaratır."},
+{c:"Rönesans",q:"Deniz kabuğu üzerindeki tanrıçayı gösteren “Venüs’ün Doğuşu” kimin eseridir?",a:["Sandro Botticelli","Raffaello","Tiziano","Filippo Lippi"],e:"1480’lerin ortası; bugün Floransa’daki Uffizi Galerisi’nde."},
+{c:"Rönesans",q:"Antik Çağ’dan bu yana ilk serbest duran çıplak bronz heykel kabul edilen “Davut” kimin eseridir?",a:["Donatello","Michelangelo","Verrocchio","Bernini"],e:"Donatello’nun bronz Davut’u 1440’lara tarihlenir; Michelangelo’nun mermer Davut’undan yaklaşık 60 yıl önce."},
+{c:"Rönesans",q:"Michelangelo Sistina Şapeli tavan fresklerini hangi yıl tamamladı?",a:["1512","1492","1541","1527"],e:"1508’de başlayıp 1512’de bitirdi. 1541 ise aynı şapeldeki “Son Yargı”nın tamamlandığı yıldır."},
+{c:"Rönesans",q:"Michelangelo’nun imzasını taşıyan tek eseri olan “Pietà” nerededir?",a:["Aziz Petrus Bazilikası, Vatikan","Floransa Katedrali","Louvre, Paris","Accademia, Venedik"],e:"Genç Michelangelo, eserin başkasına atfedildiğini duyunca Meryem’in göğüs bandına adını kazımış."},
+{c:"Rönesans",q:"Leonardo’nun “Son Akşam Yemeği” freski nerededir?",a:["Santa Maria delle Grazie, Milano","Sistina Şapeli, Vatikan","Uffizi, Floransa","San Marco, Venedik"],e:"Leonardo deneysel bir teknik kullandığı için eser kısa sürede bozulmaya başladı."},
+{c:"Rönesans",q:"1911’de Mona Lisa’yı Louvre’dan çalan kişi kimdir?",a:["Vincenzo Peruggia","Guillaume Apollinaire","Pablo Picasso","Eduardo de Valfierno"],e:"Louvre’da çalışmış İtalyan bir camcıydı; tablo iki yıl sonra Floransa’da bulundu. Apollinaire ve Picasso da sorgulanmıştı."},
+{c:"Rönesans",q:"Leonardo’nun renkler ve tonlar arasında çizgisiz, dumanımsı geçiş tekniğine ne denir?",a:["Sfumato","Impasto","Tenebrizm","Grisaille"],e:"İtalyanca “duman” kökünden gelir; Mona Lisa’nın gülümsemesindeki belirsizlik bu teknikten."},
+{c:"Rönesans",q:"Vatikan’daki “Atina Okulu” freskini kim yapmıştır?",a:["Raffaello","Leonardo da Vinci","Michelangelo","Perugino"],e:"Ortada Platon ve Aristoteles; Platon figürü için Leonardo’nun yüzünden esinlenildiği söylenir."},
+{c:"Rönesans",q:"“Urbino Venüsü” kimin eseridir?",a:["Tiziano","Giorgione","Tintoretto","Veronese"],e:"1538 tarihli eser, Manet’nin “Olympia”sı başta olmak üzere birçok sanatçıya ilham verdi."},
+{c:"Rönesans",q:"Aynadaki yansımasıyla ünlü “Arnolfini Portresi”ni kim yapmıştır?",a:["Jan van Eyck","Rogier van der Weyden","Hans Memling","Pieter Bruegel"],e:"1434; arka duvardaki yazı “Jan van Eyck buradaydı” anlamına gelir. National Gallery, Londra."},
+{c:"Rönesans",q:"Fantastik figürlerle dolu “Dünyevi Zevkler Bahçesi” triptiği kimindir?",a:["Hieronymus Bosch","Pieter Bruegel","Albrecht Dürer","Matthias Grünewald"],e:"1490–1510 civarı; bugün Madrid’deki Prado Müzesi’nde."},
+{c:"Rönesans",q:"Kış manzarası “Karda Avcılar” (1565) kimin eseridir?",a:["Yaşlı Pieter Bruegel","Hieronymus Bosch","Johannes Vermeer","Peter Paul Rubens"],e:"Mevsimleri anlatan bir dizinin parçası; Viyana Sanat Tarihi Müzesi’nde."},
+{c:"Rönesans",q:"Gravürleri ve 1500 tarihli cepheden otoportresiyle ünlü Alman ustası kimdir?",a:["Albrecht Dürer","Hans Holbein","Lucas Cranach","Matthias Grünewald"],e:"“Melankoli I” ve “Gergedan” gravürleri de Dürer’in en tanınmış işlerindendir."},
+{c:"Rönesans",q:"Uzatılmış oranlarıyla Maniyerizmin simgesi olan “Uzun Boyunlu Madonna” kimindir?",a:["Parmigianino","Pontormo","Bronzino","El Greco"],e:"Maniyerizm, Yüksek Rönesans’ın dengesine karşı bilinçli bir zarafet ve gerilim arar."},
+{c:"Rönesans",q:"İspanya’da ünlenen El Greco hangi adada doğmuştur?",a:["Girit","Kıbrıs","Rodos","Sicilya"],e:"Asıl adı Domenikos Theotokopoulos; ikon ressamı olarak başladı, Toledo’da ünlendi."},
+
+// ── BAROK & ROKOKO ──
+{c:"Barok",q:"Caravaggio’nun karanlık zeminden fışkıran sert ışık kullanımına ne ad verilir?",a:["Tenebrizm","Sfumato","Pointilizm","Grisaille"],e:"İtalyanca “tenebroso” (karanlık) kelimesinden; Avrupa’da “Caravaggistler” denen bir akım doğurdu."},
+{c:"Barok",q:"“Aziz Matta’nın Çağrılışı” kimin eseridir?",a:["Caravaggio","Annibale Carracci","Guido Reni","Orazio Gentileschi"],e:"Roma’daki San Luigi dei Francesi kilisesinde, hâlâ yapıldığı yerde görülebilir."},
+{c:"Barok",q:"“Judith Holofernes’in Başını Kesiyor” tablosuyla tanınan Barok dönemin kadın ressamı kimdir?",a:["Artemisia Gentileschi","Sofonisba Anguissola","Judith Leyster","Élisabeth Vigée Le Brun"],e:"Floransa Sanat Akademisi’ne kabul edilen ilk kadın sanatçıdır."},
+{c:"Barok",q:"Roma’daki “Azize Teresa’nın Vecdi” heykelini yapan sanatçı kimdir?",a:["Gian Lorenzo Bernini","Francesco Borromini","Alessandro Algardi","Antonio Canova"],e:"Bernini heykel, mimari ve ışığı birleştirip sahnelenmiş bir an yaratır."},
+{c:"Barok",q:"Amsterdam milis birliğini gösteren “Gece Devriyesi” kimin eseridir?",a:["Rembrandt","Frans Hals","Johannes Vermeer","Jan Steen"],e:"1642; aslında gece sahnesi değil, kararan vernik yüzünden bu adı aldı. Rijksmuseum’da."},
+{c:"Barok",q:"“İnci Küpeli Kız” kimin eseridir?",a:["Johannes Vermeer","Rembrandt","Pieter de Hooch","Gerard ter Borch"],e:"Bir portre değil, “tronie” denen hayali bir figür çalışması; Lahey’deki Mauritshuis’te."},
+{c:"Barok",q:"İspanya sarayını ve ressamın kendisini gösteren “Nedimeler” (Las Meninas) kimin eseridir?",a:["Diego Velázquez","Francisco Goya","Bartolomé Murillo","Francisco de Zurbarán"],e:"1656; aynadaki kral ve kraliçe yansımasıyla sanat tarihinin en çok tartışılan tablolarından."},
+{c:"Barok",q:"Salıncakta uçuşan genç kadını gösteren Rokoko tablosu “Salıncak” kimindir?",a:["Jean-Honoré Fragonard","François Boucher","Antoine Watteau","Jean-Baptiste Chardin"],e:"1767 civarı; Londra’daki Wallace Collection’da."},
+
+// ── 18–19. YÜZYIL ──
+{c:"19. Yüzyıl",q:"Fransız Devrimi’nin simge eserlerinden “Marat’nın Ölümü” kimindir?",a:["Jacques-Louis David","Jean-Auguste-Dominique Ingres","Eugène Delacroix","Théodore Géricault"],e:"1793; David devrimci Marat’yı bir şehit gibi resmetti. Neoklasizmin önde gelen ismidir."},
+{c:"19. Yüzyıl",q:"1830 Temmuz Devrimi’ni anlatan “Halka Yol Gösteren Özgürlük” kimin eseridir?",a:["Eugène Delacroix","Jacques-Louis David","Gustave Courbet","Théodore Géricault"],e:"Fransız Romantizminin manifestosu sayılır; Louvre’dadır."},
+{c:"19. Yüzyıl",q:"Gerçek bir deniz felaketini konu alan “Medusa’nın Salı” kimin eseridir?",a:["Théodore Géricault","Eugène Delacroix","J. M. W. Turner","Jean-Louis Ernest Meissonier"],e:"1819; Géricault hayatta kalanlarla görüşüp morglarda çalışarak hazırlandı."},
+{c:"19. Yüzyıl",q:"Kurşuna dizilen İspanyolları gösteren “3 Mayıs 1808” kimin eseridir?",a:["Francisco Goya","Diego Velázquez","El Greco","Bartolomé Murillo"],e:"Napolyon ordusunun Madrid’deki infazlarını anlatır; modern savaş resminin öncüsü."},
+{c:"19. Yüzyıl",q:"“Sis Denizi Üzerindeki Gezgin” hangi Alman Romantik ressamın eseridir?",a:["Caspar David Friedrich","Philipp Otto Runge","J. M. W. Turner","John Constable"],e:"1818 civarı; sırtı dönük figür, doğa karşısındaki yüceliği (sublime) temsil eder."},
+{c:"19. Yüzyıl",q:"“Bana bir melek gösterin, onu resmedeyim” diyen Realizmin öncüsü kimdir?",a:["Gustave Courbet","Jean-François Millet","Honoré Daumier","Édouard Manet"],e:"Courbet, “Ornans’ta Cenaze” gibi eserlerle sıradan insanı büyük tuvallere taşıdı."},
+{c:"19. Yüzyıl",q:"1863 Reddedilenler Salonu’nda skandal yaratan “Çimenlerde Kahvaltı” kimin eseridir?",a:["Édouard Manet","Claude Monet","Pierre-Auguste Renoir","Gustave Courbet"],e:"Giyinik erkekler arasında çıplak bir kadın; Monet de sonradan aynı adla bir tablo yaptı."},
+{c:"19. Yüzyıl",q:"Empresyonizm akımı adını hangi tablodan almıştır?",a:["İzlenim, Gün Doğumu","Nilüferler","Rouen Katedrali","Saman Yığınları"],e:"Monet’nin 1872 tarihli tablosu; bir eleştirmen alay amacıyla grubu “izlenimciler” diye andı."},
+{c:"19. Yüzyıl",q:"Claude Monet nilüferli bahçesini hangi köyde kurmuştu?",a:["Giverny","Arles","Barbizon","Argenteuil"],e:"Monet hayatının son 43 yılını Giverny’de geçirdi; bahçe bugün ziyarete açık."},
+{c:"19. Yüzyıl",q:"Balerin resimleri ve heykelleriyle tanınan Empresyonist kimdir?",a:["Edgar Degas","Pierre-Auguste Renoir","Alfred Sisley","Berthe Morisot"],e:"Degas kendini empresyonist değil “realist” olarak tanımlamayı tercih ederdi."},
+{c:"19. Yüzyıl",q:"“Grande Jatte Adası’nda Bir Pazar Öğleden Sonrası” ile noktacılığı (pointilizm) başlatan kimdir?",a:["Georges Seurat","Paul Signac","Camille Pissarro","Paul Cézanne"],e:"Seurat yaklaşık iki yıl çalıştı; renkler göz tarafından karışsın diye minik noktalar kullandı."},
+{c:"19. Yüzyıl",q:"Van Gogh “Yıldızlı Gece”yi hangi kasabada yaptı?",a:["Saint-Rémy-de-Provence","Arles","Auvers-sur-Oise","Paris"],e:"1889’da, Saint-Rémy’deki akıl hastanesinde kaldığı odanın penceresinden gördüğü manzaradan."},
+{c:"19. Yüzyıl",q:"Van Gogh 1888’de kulağını kestiği krizden önce Arles’da hangi ressamla birlikte yaşıyordu?",a:["Paul Gauguin","Henri de Toulouse-Lautrec","Émile Bernard","Paul Cézanne"],e:"“Sarı Ev”de yaklaşık iki ay süren ortaklık, şiddetli bir tartışmayla sona erdi."},
+{c:"19. Yüzyıl",q:"Mont Sainte-Victoire dağını onlarca kez resmeden, “modern sanatın babası” denen ressam kimdir?",a:["Paul Cézanne","Claude Monet","Paul Gauguin","Georges Seurat"],e:"Doğayı silindir, küre ve koni gibi temel biçimlerle ele alması Kübizme yol açtı."},
+{c:"19. Yüzyıl",q:"“Çığlık” kimin eseridir?",a:["Edvard Munch","James Ensor","Egon Schiele","Gustav Klimt"],e:"Norveçli Munch’un birkaç versiyonu var; ilki 1893 tarihli. Dışavurumculuğun habercisi."},
+{c:"19. Yüzyıl",q:"Altın varaklı “Öpücük” tablosu kimin eseridir?",a:["Gustav Klimt","Egon Schiele","Alfons Mucha","Koloman Moser"],e:"1907–08; Viyana Ayrılıkçılarının (Secession) önderi Klimt’in “altın dönemi”nden."},
+{c:"19. Yüzyıl",q:"Barselona’daki Sagrada Família’nın mimarı kimdir?",a:["Antoni Gaudí","Lluís Domènech i Montaner","Josep Puig i Cadafalch","Ricardo Bofill"],e:"İnşaatı 1882’de başladı ve hâlâ sürüyor; Gaudí ölene dek bu yapıya adandı."},
+
+// ── MODERN & ÇAĞDAŞ ──
+{c:"Modern",q:"“Vahşi hayvanlar” anlamına gelen Fovizm akımının öncüsü kimdir?",a:["Henri Matisse","André Derain","Maurice de Vlaminck","Georges Braque"],e:"1905 Sonbahar Salonu’nda bir eleştirmen, cesur renkleri görünce onlara “fauves” dedi."},
+{c:"Modern",q:"Kübizmin başlangıç eseri sayılan “Avignonlu Kızlar” (1907) kimin eseridir?",a:["Pablo Picasso","Georges Braque","Juan Gris","Fernand Léger"],e:"İber heykeli ve Afrika maskelerinden etkilenen eser, perspektif geleneğini kırdı."},
+{c:"Modern",q:"Picasso’nun “Guernica”sı bugün hangi müzededir?",a:["Reina Sofía, Madrid","Prado, Madrid","MoMA, New York","Picasso Müzesi, Barselona"],e:"Picasso’nun isteğiyle Franco dönemi bitene dek MoMA’da kaldı; 1981’de İspanya’ya döndü."},
+{c:"Modern",q:"1917’de bir pisuvarı “Çeşme” adıyla sergiye gönderen sanatçı kimdir?",a:["Marcel Duchamp","Man Ray","Francis Picabia","Tristan Tzara"],e:"“Hazır nesne” (readymade) fikri, sanatın ne olduğu sorusunu kökten değiştirdi."},
+{c:"Modern",q:"Dadaizm hangi şehirdeki Cabaret Voltaire’de doğmuştur?",a:["Zürih","Paris","Berlin","Viyana"],e:"1916’da, I. Dünya Savaşı’ndan kaçan sanatçılar tarafından tarafsız İsviçre’de kuruldu."},
+{c:"Modern",q:"Eriyen saatleriyle ünlü “Belleğin Azmi” kimin eseridir?",a:["Salvador Dalí","René Magritte","Max Ernst","Yves Tanguy"],e:"1931; ufak boyutuyla (24×33 cm) çoğu kişiyi şaşırtır. MoMA’dadır."},
+{c:"Modern",q:"Bir pipo resminin altına “Bu bir pipo değildir” yazan sanatçı kimdir?",a:["René Magritte","Salvador Dalí","Joan Miró","Giorgio de Chirico"],e:"“İmgelerin İhaneti” (1929): resim nesnenin kendisi değil, temsilidir."},
+{c:"Modern",q:"“Sanatta Ruhsallık Üzerine” kitabını yazan, soyut resmin öncüsü kimdir?",a:["Vasili Kandinski","Kazimir Maleviç","Piet Mondrian","Paul Klee"],e:"Kandinski renkleri ve biçimleri müzik notaları gibi duygu taşıyan öğeler olarak görüyordu."},
+{c:"Modern",q:"Siyah çizgiler ve ana renklerden oluşan ızgara kompozisyonlarıyla tanınan De Stijl sanatçısı kimdir?",a:["Piet Mondrian","Theo van Doesburg","Gerrit Rietveld","Kazimir Maleviç"],e:"Mondrian “Neoplastisizm” adını verdiği bu dili saf yatay-dikey uyuma dayandırdı."},
+{c:"Modern",q:"1919’da Weimar’da Bauhaus okulunu kuran mimar kimdir?",a:["Walter Gropius","Ludwig Mies van der Rohe","Le Corbusier","Marcel Breuer"],e:"Bauhaus, sanatı zanaat ve endüstriyle birleştirerek modern tasarımın temelini attı."},
+{c:"Modern",q:"Paris yakınlarındaki Villa Savoye hangi mimarın eseridir?",a:["Le Corbusier","Walter Gropius","Alvar Aalto","Adolf Loos"],e:"1931; mimarın “modern mimarinin beş ilkesi”ni örnekleyen manifesto yapı."},
+{c:"Modern",q:"Bir şelalenin üzerine kurulu “Fallingwater” evinin mimarı kimdir?",a:["Frank Lloyd Wright","Louis Kahn","Richard Neutra","Philip Johnson"],e:"1935–39, Pennsylvania; Wright’ın “organik mimari” anlayışının simgesi."},
+{c:"Modern",q:"Tuvali yere serip boyayı damlatma ve sıçratma tekniğiyle tanınan Soyut Dışavurumcu kimdir?",a:["Jackson Pollock","Willem de Kooning","Franz Kline","Robert Motherwell"],e:"“Aksiyon resmi” denen bu yaklaşımda resim yapma eylemi eserin kendisi kadar önemlidir."},
+{c:"Modern",q:"Houston’da adını taşıyan bir şapel bulunan, büyük renk alanı resimleriyle ünlü sanatçı kimdir?",a:["Mark Rothko","Barnett Newman","Clyfford Still","Ad Reinhardt"],e:"Rothko Şapeli 1971’de, sanatçının ölümünden bir yıl sonra açıldı."},
+{c:"Modern",q:"“Campbell Çorba Kutuları” ile Pop Art’ın simgesi olan sanatçı kimdir?",a:["Andy Warhol","Roy Lichtenstein","Claes Oldenburg","Jasper Johns"],e:"1962; 32 farklı çorba çeşidini gösteren 32 tuval. MoMA’dadır."},
+{c:"Çağdaş",q:"Kimliği gizli sokak sanatçısı Banksy en çok hangi İngiliz şehriyle özdeşleşir?",a:["Bristol","Manchester","Liverpool","Birmingham"],e:"Sanatçının ilk işleri 1990’larda Bristol’ün graffiti sahnesinde ortaya çıktı."},
+{c:"Çağdaş",q:"Titanyum kaplı Guggenheim Bilbao Müzesi’nin mimarı kimdir?",a:["Frank Gehry","Zaha Hadid","Renzo Piano","Rem Koolhaas"],e:"1997’de açılan bina, şehri dönüştürmesiyle “Bilbao etkisi” kavramını doğurdu."},
+{c:"Çağdaş",q:"Marina Abramović’in “The Artist Is Present” (2010) performansı hangi müzede gerçekleşti?",a:["MoMA, New York","Tate Modern, Londra","Guggenheim, New York","Centre Pompidou, Paris"],e:"Abramović yaklaşık üç ay boyunca 700 saatten fazla oturup ziyaretçilerle sessizce göz göze geldi."},
+{c:"Çağdaş",q:"Japon sanatçı Yayoi Kusama hangi motifle özdeşleşmiştir?",a:["Puantiyeler (benekler)","Origami kuşlar","Kaligrafik fırça darbeleri","Neon yazılar"],e:"Kusama’nın “Sonsuzluk Odaları” da dünyanın en çok sıra beklenen sergileri arasında."},
+
+// ── TÜRK & İSLAM SANATI ──
+{c:"Türk & İslam",q:"Mimar Sinan’ın “ustalık eserim” dediği cami hangisidir?",a:["Selimiye Camii, Edirne","Süleymaniye Camii, İstanbul","Şehzade Camii, İstanbul","Mihrimah Sultan Camii, Edirnekapı"],e:"Şehzade çıraklık, Süleymaniye kalfalık, Selimiye ise ustalık eseri olarak anılır."},
+{c:"Türk & İslam",q:"İstanbul’daki Sultanahmet Camii’nin mimarı kimdir?",a:["Sedefkâr Mehmed Ağa","Mimar Sinan","Davut Ağa","Mimar Kemaleddin"],e:"1609–1616; Sinan’ın öğrencisiydi ve sedef kakmacılığı ustası olduğu için bu lakabı aldı."},
+{c:"Türk & İslam",q:"Lale Devri’nin ünlü minyatür ustası, “Surname-i Vehbi” resimleriyle tanınan sanatçı kimdir?",a:["Levni","Nakkaş Osman","Matrakçı Nasuh","Siyavuş"],e:"Levni, Osmanlı minyatürüne daha canlı renkler ve tekil figür çalışmaları getirdi."},
+{c:"Türk & İslam",q:"Matrakçı Nasuh minyatür sanatında daha çok neyle tanınır?",a:["Kuşbakışı şehir ve menzil tasvirleriyle","Padişah portreleriyle","Çiçek ve lale motifleriyle","Savaş sahnelerinde dramatik ışıkla"],e:"Kanuni’nin seferlerinde geçilen şehirleri insan figürü kullanmadan topografik olarak resmetti."},
+{c:"Türk & İslam",q:"“Kaplumbağa Terbiyecisi” tablosunun ressamı kimdir?",a:["Osman Hamdi Bey","Şeker Ahmed Paşa","Hoca Ali Rıza","İbrahim Çallı"],e:"1906; 2004’te Pera Müzesi tarafından rekor bir bedelle satın alındı."},
+{c:"Türk & İslam",q:"Osman Hamdi Bey’in 1882’de kurduğu, bugünkü Mimar Sinan Güzel Sanatlar Üniversitesi’nin temeli olan okul hangisidir?",a:["Sanayi-i Nefise Mektebi","Darülfünun","Mekteb-i Mülkiye","Darüşşafaka"],e:"Osman Hamdi aynı zamanda Arkeoloji Müzesi’nin de kurucu müdürüdür."},
+{c:"Türk & İslam",q:"Sayda’da bulunan ünlü “İskender Lahdi” bugün hangi müzededir?",a:["İstanbul Arkeoloji Müzeleri","Louvre","British Museum","Anadolu Medeniyetleri Müzesi"],e:"1887’de Osman Hamdi Bey’in kazısında çıkarıldı; boyalarının izleri hâlâ görülebilir."},
+{c:"Türk & İslam",q:"Türk resminde “1914 Kuşağı” olarak bilinen ve izlenimci etkiler taşıyan grubun diğer adı nedir?",a:["Çallı Kuşağı","D Grubu","Yeniler Grubu","Müstakil Ressamlar ve Heykeltıraşlar Birliği"],e:"Adını İbrahim Çallı’dan alır; Avni Lifij, Feyhaman Duran, Hikmet Onat gibi isimleri kapsar."},
+{c:"Türk & İslam",q:"1958 Brüksel Dünya Fuarı’nda Türk pavyonu için yaptığı mozaik panoyla altın madalya kazanan ressam kimdir?",a:["Bedri Rahmi Eyüboğlu","Burhan Doğançay","Nuri İyem","Abidin Dino"],e:"Bedri Rahmi halk sanatı motiflerini modern resimle buluşturan bir isimdi."},
+{c:"Türk & İslam",q:"Su yüzeyinde dağıtılan boyaların kâğıda aktarılmasıyla yapılan geleneksel sanat hangisidir?",a:["Ebru","Tezhip","Katı’ı","Kündekâri"],e:"Boyalar, sığır ödü damlatılmış kitreli suyun yüzeyinde dağıtılır; 2014’te UNESCO listesine girdi."},
+{c:"Türk & İslam",q:"El yazması kitapları altın ve boyalarla süsleme sanatına ne denir?",a:["Tezhip","Ebru","Çini","Kalemişi"],e:"Arapça “altınlama” anlamındaki kökten gelir; hat sanatının yakın tamamlayıcısıdır."},
+{c:"Türk & İslam",q:"Babür İmparatoru Şah Cihan’ın eşi için yaptırdığı Tac Mahal hangi şehirdedir?",a:["Agra","Delhi","Jaipur","Lahor"],e:"1632’de başlanan anıt mezar, Mümtaz Mahal’in anısına yaptırıldı."},
+{c:"Türk & İslam",q:"Nasrî hanedanının saray kompleksi Elhamra hangi şehirdedir?",a:["Granada","Sevilla","Kurtuba","Toledo"],e:"Mukarnaslı tavanları ve Aslanlı Avlu’suyla Endülüs İslam mimarisinin zirvesi."},
+
+// ── ASYA & TEKNİK ──
+{c:"Asya & Teknik",q:"“Kanagawa Açıklarında Büyük Dalga” baskısının sanatçısı kimdir?",a:["Katsushika Hokusai","Utagawa Hiroshige","Kitagawa Utamaro","Tōshūsai Sharaku"],e:"1831 civarı, “Fuji Dağı’nın 36 Görünümü” dizisinden; Avrupa sanatını da derinden etkiledi."},
+{c:"Asya & Teknik",q:"Edo dönemi Japonya’sının ahşap baskı resim geleneğine ne ad verilir?",a:["Ukiyo-e","Sumi-e","Ikebana","Kintsugi"],e:"“Yüzen dünyanın resimleri” anlamına gelir; Van Gogh ve Monet koleksiyoncusuydu."},
+{c:"Asya & Teknik",q:"Henüz kurumamış yaş sıva üzerine pigment uygulama tekniğine ne denir?",a:["Fresk (buon fresco)","Tempera","Guaj","Enkaustik"],e:"Boya sıvayla birlikte kuruyup duvarın parçası olur; hızlı çalışmayı gerektirir."},
+{c:"Asya & Teknik",q:"Boyanın fırça ya da spatula izleri görünecek kadar kalın sürülmesine ne denir?",a:["Impasto","Glaze (lazür)","Sfumato","Grisaille"],e:"Van Gogh ve Rembrandt bu tekniğin en tanınmış uygulayıcılarındandır."},
+{c:"Asya & Teknik",q:"Kafatası, sönen mum ve çürüyen meyvelerle hayatın geçiciliğini hatırlatan natürmort türü hangisidir?",a:["Vanitas","Trompe-l’œil","Veduta","Capriccio"],e:"17. yüzyıl Hollanda resminde çok yaygındı; Latince “boşluk, beyhudelik” demektir."}
+];
+
+const CATS = ["Antik","Orta Çağ","Rönesans","Barok","19. Yüzyıl","Modern","Çağdaş","Türk & İslam","Asya & Teknik"];
+const $ = s => document.querySelector(s);
+const shuffle = arr => { const a = arr.slice(); for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+
+let len = 20, selCats = new Set(CATS), deck = [], idx = 0, score = 0, answered = false, log = [];
+
+// Setup UI
+const chips = $('#chips');
+const allChip = document.createElement('button');
+allChip.className = 'chip on'; allChip.textContent = 'Tümü'; allChip.dataset.all = '1';
+chips.appendChild(allChip);
+CATS.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'chip'; b.dataset.c = c;
+  b.innerHTML = `${c}<span class="n">${Q.filter(x=>x.c===c).length}</span>`;
+  chips.appendChild(b);
+});
+function syncChips(){
+  const all = selCats.size === CATS.length;
+  chips.querySelectorAll('.chip').forEach(ch => {
+    if (ch.dataset.all) ch.classList.toggle('on', all);
+    else ch.classList.toggle('on', !all && selCats.has(ch.dataset.c));
+  });
+  const pool = Q.filter(q=>selCats.has(q.c)).length;
+  document.querySelectorAll('.len').forEach(b => {
+    const n = +b.dataset.n;
+    b.querySelector('small').textContent = n > pool ? `Bu salonlarda ${pool}` : {20:'Kısa ziyaret',50:'Uzun tur',100:'Tüm koleksiyon'}[n];
+  });
+}
+chips.addEventListener('click', e => {
+  const ch = e.target.closest('.chip'); if (!ch) return;
+  if (ch.dataset.all) selCats = new Set(CATS);
+  else {
+    const c = ch.dataset.c;
+    if (selCats.size === CATS.length) selCats = new Set([c]);
+    else if (selCats.has(c)) { selCats.delete(c); if (!selCats.size) selCats = new Set(CATS); }
+    else selCats.add(c);
+  }
+  syncChips();
+});
+$('#lengths').addEventListener('click', e => {
+  const b = e.target.closest('.len'); if (!b) return;
+  document.querySelectorAll('.len').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); len = +b.dataset.n;
+});
+syncChips();
+
+function show(id){ ['start','quiz','result'].forEach(s => $('#'+s).classList.toggle('hidden', s!==id)); window.scrollTo({top:0,behavior:'smooth'}); }
+
+function start(){
+  const pool = shuffle(Q.filter(q=>selCats.has(q.c)));
+  deck = pool.slice(0, Math.min(len, pool.length)).map(q => {
+    const opts = shuffle(q.a.map((t,i)=>({t, ok:i===0})));
+    return {...q, opts};
+  });
+  idx = 0; score = 0; log = [];
+  $('#qt').textContent = deck.length;
+  $('#meta').textContent = `Tur · ${deck.length} soru`;
+  show('quiz'); render();
+}
+
+function render(){
+  answered = false;
+  const q = deck[idx];
+  const card = $('#card'); card.classList.remove('slide'); void card.offsetWidth; card.classList.add('slide');
+  $('#qi').textContent = idx+1; $('#sc').textContent = score;
+  $('#bar').style.width = (idx/deck.length*100)+'%';
+  $('#cat').textContent = q.c;
+  $('#q').textContent = q.q;
+  $('#cap').innerHTML = '';
+  const box = $('#opts'); box.innerHTML = '';
+  q.opts.forEach((o,i) => {
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.innerHTML = `<span class="k">${'ABCD'[i]}</span><span></span>`;
+    b.lastChild.textContent = o.t;
+    b.onclick = () => pick(i);
+    box.appendChild(b);
+  });
+  const nx = $('#next'); nx.disabled = true;
+  nx.textContent = idx === deck.length-1 ? 'Sonucu gör →' : 'Sonraki →';
+}
+
+function pick(i){
+  if (answered) return; answered = true;
+  const q = deck[idx], btns = [...document.querySelectorAll('.opt')];
+  const ok = q.opts[i].ok;
+  if (ok) score++;
+  btns.forEach((b,j) => {
+    b.disabled = true;
+    if (q.opts[j].ok) b.classList.add('right');
+    else if (j===i) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+  log.push({q, ok, picked:q.opts[i].t});
+  $('#sc').textContent = score;
+  const cap = document.createElement('div');
+  cap.className = 'caption ' + (ok?'ok':'no');
+  const msgs = ok ? ['Bravo.','Tam isabet.','Küratör onayladı.','Kesinlikle.','Gözün keskin.'] : ['Bu sefer olmadı.','Az kaldı.','Bir dahaki salonda.','Not alalım.'];
+  cap.innerHTML = `<b></b><span></span>`;
+  cap.firstChild.textContent = msgs[Math.floor(Math.random()*msgs.length)];
+  cap.lastChild.textContent = (ok ? '' : `Doğru cevap: ${q.a[0]}. `) + q.e;
+  $('#cap').appendChild(cap);
+  $('#next').disabled = false;
+  $('#bar').style.width = ((idx+1)/deck.length*100)+'%';
+}
+
+function next(){
+  if (!answered) return;
+  if (idx < deck.length-1){ idx++; render(); } else finish();
+}
+
+function finish(){
+  const total = log.length || 1;
+  const pct = Math.round(score/total*100);
+  $('#pct').innerHTML = `${pct}<small>%</small>`;
+  const rank = pct>=90?'Baş Küratör':pct>=75?'Sanat Tarihçisi':pct>=55?'Müze Rehberi':pct>=35?'Galeri Müdavimi':'Meraklı Ziyaretçi';
+  $('#rank').textContent = rank;
+  $('#sub').textContent = `${log.length} sorudan ${score} doğru`;
+  const bars = $('#bars'); bars.innerHTML = '';
+  CATS.forEach(c => {
+    const items = log.filter(l=>l.q.c===c); if (!items.length) return;
+    const k = items.filter(l=>l.ok).length;
+    const row = document.createElement('div'); row.className='bar-row';
+    row.innerHTML = `<span>${c}</span><div class="bar"><i style="width:${k/items.length*100}%"></i></div><span>${k}/${items.length}</span>`;
+    bars.appendChild(row);
+  });
+  const wrong = log.filter(l=>!l.ok);
+  const rv = $('#review'); rv.innerHTML = '';
+  if (wrong.length){
+    const h = document.createElement('h3'); h.textContent = `Tekrar bakmaya değer (${wrong.length})`; rv.appendChild(h);
+    wrong.forEach(w => {
+      const d = document.createElement('div'); d.className='rv';
+      d.innerHTML = `<div class="q"></div><div class="y"></div><div class="c"></div><div class="e"></div>`;
+      d.children[0].textContent = w.q.q;
+      d.children[1].textContent = '✗ Senin cevabın: ' + w.picked;
+      d.children[2].textContent = '✓ Doğru: ' + w.q.a[0];
+      d.children[3].textContent = w.q.e;
+      rv.appendChild(d);
+    });
+  }
+  window._shareText = `Galeri sanat tarihi quiz’inde ${log.length} sorudan ${score} doğru yaptım (%${pct}) — unvanım: ${rank}. Sen kaç yaparsın?`;
+  show('result');
+}
+
+function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),1800); }
+
+$('#go').onclick = start;
+$('#next').onclick = next;
+$('#quit').onclick = () => { if (log.length) finish(); else show('start'); };
+$('#again').onclick = () => { $('#meta').textContent='Sanat Tarihi · 100 Soru'; show('start'); };
+$('#share').onclick = async () => {
+  try { await navigator.clipboard.writeText(window._shareText); toast('Skor kopyalandı'); }
+  catch(e){ toast(window._shareText); }
+};
+document.addEventListener('keydown', e => {
+  if ($('#quiz').classList.contains('hidden')) return;
+  if (['1','2','3','4'].includes(e.key)) pick(+e.key-1);
+  else if (e.key === 'Enter') next();
+});
+</script>
+</body>
+</html>
